@@ -10,26 +10,26 @@ class Biblioteca():
 
             if(n==2):
                 if(texto[0] == "shodan"):
-                    return {"n":10,"busqueda":texto[1]} #Devolvemos un diccionario con n por defecto a 10
+                    return {"n":10,"search":texto[1]} #Devolvemos un diccionario con n por defecto a 10
                 else:
-                    return "No has escrito 'shodan' en la instrucción."
+                    return "You did not write 'shodan' in the instruction."
             elif(n==3):
                 if(texto[0] == "shodan"):
                     if(texto[2].isdigit()):
-                        return {"n":int(texto[2]),"busqueda":texto[1]}
+                        return {"n":int(texto[2]),"search":texto[1]}
                     else:
                         return "El tercer valor tiene que ser un etero."
                 else:
-                    return "No has escrito 'shodan' en la instrucción."
+                    return "You did not write 'shodan' in the instruction."
             else:
-                return "El máximo de argumentos en 3."
+                return "Maximum amount of arguments is 3."
         else:
-            return "No has escrito ninguna instrucción"
+            return "You have not written any instructions"
 
 if __name__ == "__main__":
     b = Biblioteca()
     #res = b.argumentos_validos("shodan apache 5")
     res = b.argumentos_validos("shodan apache 5")
     if type(res) is dict:
-        print("Es un diccionario")
+        print("Is in dictionary")
     print(res)
