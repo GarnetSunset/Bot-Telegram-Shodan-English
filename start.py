@@ -12,16 +12,16 @@ from ishodan import Info_Shodan
 #os.system("clear")
 
 def guardar_usuario_BBDD(token,busqueda,idtg):
-	conexion = sqlite3.connect('usuarios.db') # We connect to the database users.db (create it if it does not exist)
+	conexion = sqlite3.connect('users.db') # We connect to the database users.db (create it if it does not exist)
 	cursor = conexion.cursor() # Now we will create a user table to store "id", "message" and "ip token"
-	cursor.execute("INSERT INTO usuarios VALUES (null,'{}', '{}', '{}')".format(idtg,busqueda,token))
+	cursor.execute("INSERT INTO users VALUES (null,'{}', '{}', '{}')".format(idtg,busqueda,token))
 	conexion.commit() # We save the changes by committing
 	conexion.close() # We closed the connections
 
 def eliminar_usuario_BBDD(idtg):
-	conexion = sqlite3.connect('usuarios.db')
+	conexion = sqlite3.connect('users.db')
 	cursor = conexion.cursor()
-	sql = "DELETE FROM usuarios WHERE idtg='{}'".format(idtg)
+	sql = "DELETE FROM users WHERE idtg='{}'".format(idtg)
 	print("sql borrar: ",sql)
 	r = cursor.execute(sql)
 	print("r:",r)
@@ -29,10 +29,10 @@ def eliminar_usuario_BBDD(idtg):
 	conexion.close()
 
 def obtener_usuario_BBDD(idtg):
-	conexion = sqlite3.connect('usuarios.db')
+	conexion = sqlite3.connect('users.db')
 	cursor = conexion.cursor()
 
-	sql = "SELECT * FROM usuarios WHERE idtg='{}'".format(idtg)
+	sql = "SELECT * FROM users WHERE idtg='{}'".format(idtg)
 	#print("sql: ",sql)
 	cursor.execute(sql) # We retrieve a record of the user table
 	usuario = cursor.fetchone()
@@ -94,12 +94,12 @@ i = Info_Shodan() #Inicializo la Clase Info_Shodan()
 if path.isfile("users.db") != True:
 	print("Creating a database of users")
 
-	conexion = sqlite3.connect('users.db') # Nos conectamos a la base de datos usuarios.db (la crea si no existe)
-	cursor = conexion.cursor() # Ahora crearemos una tabla de usuarios para almacenar "id", "mensaje" y "token de ip"
+	conexion = sqlite3.connect('users.db') # Nos conectamos a la base de datos users.db (la crea si no existe)
+	cursor = conexion.cursor() # Ahora crearemos una tabla de users para almacenar "id", "mensaje" y "token de ip"
 	cursor.execute("CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT,idtg VARCHAR(100),mensaje VARCHAR(100), tokenip VARCHAR(250))")
 	conexion.commit() # Guardamos los cambios haciendo un commit
 
-	#cursor.execute("INSERT INTO usuarios VALUES (null,'188396571', 'apache 5', '1=192.168.1.211,2=192.168.1.209')")
+	#cursor.execute("INSERT INTO users VALUES (null,'188396571', 'apache 5', '1=192.168.1.211,2=192.168.1.209')")
 
 	conexion.commit() # Guardamos los cambios haciendo un commit
 	conexion.close() # Cerramos la conexións
