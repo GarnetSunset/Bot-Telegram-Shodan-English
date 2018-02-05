@@ -11,10 +11,10 @@ from ishodan import Info_Shodan
 
 #os.system("clear")
 
-def guardar_usuario_BBDD(token,busqueda,idtg):
+def guardar_usuario_BBDD(token,users,idtg):
 	conexion = sqlite3.connect('users.db') # We connect to the database users.db (create it if it does not exist)
 	cursor = conexion.cursor() # Now we will create a user table to store "id", "message" and "ip token"
-	cursor.execute("INSERT INTO users VALUES (null,'{}', '{}', '{}')".format(idtg,busqueda,token))
+	cursor.execute("INSERT INTO users VALUES (null,'{}', '{}', '{}')".format(idtg,users,token))
 	conexion.commit() # We save the changes by committing
 	conexion.close() # We closed the connections
 
@@ -158,9 +158,9 @@ def echo_all(message):
 
 				res=""
 				if('n' in diccionario):
-					res = i.buscar(diccionario["busqueda"],diccionario["n"])
+					res = i.buscar(diccionario["users"],diccionario["n"])
 				else:
-					res = i.buscar(diccionario["busqueda"])
+					res = i.buscar(diccionario["users"])
 
 				resultados = i.nlimit
 
@@ -180,7 +180,7 @@ def echo_all(message):
 					bot.send_message(chat_id,"<b>Choose an option (1/"+str(resultados)+"): </b>",parse_mode="HTML",reply_markup=markup)
 
 				elif(res==False):
-						bot.send_message(chat_id,"No results are available for that search: <b>"+str(diccionario["busqueda"]+"</b>"),parse_mode="HTML")
+						bot.send_message(chat_id,"No results are available for that search: <b>"+str(diccionario["users"]+"</b>"),parse_mode="HTML")
 				else:
 					bot.send_message(chat_id,res,parse_mode="HTML")
 
