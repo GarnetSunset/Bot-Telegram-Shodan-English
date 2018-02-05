@@ -1,27 +1,22 @@
 import time
 import requests
-import telebot #Importamos las librería
+import telebot 
 from telebot import types
-import os.path as path #importamos la líbreria para comprobar si existe la BBDD
+import os.path as path 
 import os
-import sqlite3 #Libreria para atarcar un .db
+import sqlite3 #Library for database creation 
 
-#LIBRERIAS PROPIAS
 from biblioteca import Biblioteca
 from ishodan import Info_Shodan
 
 #os.system("clear")
 
-############################################################
-#########               BASE DE DATOS             ##########
-############################################################
-
 def guardar_usuario_BBDD(token,busqueda,idtg):
-	conexion = sqlite3.connect('usuarios.db') # Nos conectamos a la base de datos usuarios.db (la crea si no existe)
-	cursor = conexion.cursor() # Ahora crearemos una tabla de usuarios para almacenar "id", "mensaje" y "token de ip"
+	conexion = sqlite3.connect('usuarios.db') # We connect to the database users.db (create it if it does not exist)
+	cursor = conexion.cursor() # Now we will create a user table to store "id", "message" and "ip token"
 	cursor.execute("INSERT INTO usuarios VALUES (null,'{}', '{}', '{}')".format(idtg,busqueda,token))
-	conexion.commit() # Guardamos los cambios haciendo un commit
-	conexion.close() # Cerramos la conexións
+	conexion.commit() # We save the changes by committing
+	conexion.close() # We closed the connections
 
 def eliminar_usuario_BBDD(idtg):
 	conexion = sqlite3.connect('usuarios.db')
@@ -39,20 +34,20 @@ def obtener_usuario_BBDD(idtg):
 
 	sql = "SELECT * FROM usuarios WHERE idtg='{}'".format(idtg)
 	#print("sql: ",sql)
-	cursor.execute(sql) # Recuperamos un registro de la tabla de usuarios
+	cursor.execute(sql) # We retrieve a record of the user table
 	usuario = cursor.fetchone()
 	if(usuario == None):
-		#print("No hay ningun registro de este usuario")
+		#print("There is no record of this user")
 		conexion.close()
 		return False
 	else:
-		#print("Se han encontrado un historia de este usuario:",usuario)
+		#print("A history of this user has been found:",usuario)
 		conexion.close()
 		return usuario
 
 def generar_array_key_token_BBDD(token):
 
-	ips = token.split(",") #parto el array por la coma
+	ips = token.split(",") # using a comma to delimit the array
 	#print("ips: ", ips)
 	token_array = []
 	for ip in ips:
@@ -63,16 +58,6 @@ def generar_array_key_token_BBDD(token):
 	#print("Token_array: ",token_array)
 
 	return token_array #Devolvemos un array
-
-############################################################
-#########           END BASE DE DATOS             ##########
-############################################################
-
-
-
-############################################################
-#########           FUNCIONES BOT                 ##########
-############################################################
 
 def crear_teclado_tl(num):
 	markup = types.ReplyKeyboardMarkup(row_width=5)
@@ -95,27 +80,23 @@ def obtener_numero_teclado(message):
 
 		indice = int(message.text)-1
 		valor = array_token[indice]['ip']
-		print("valor:",valor)
+		print("value:",valor)
 		return str(valor)
 
 	else:
-		return "Lo siento, tiene que ser un número del 1 al 20"
-
-############################################################
-#########           END FUNCIONES BOT             ##########
-############################################################
+		return "Sorry, has to be a number from 1 to 20"
 
 TOKEN = open('telegram-key.txt').readline().rstrip('\n') # Ponemos nuestro Token generado con el @BotFather
 bot = telebot.TeleBot(TOKEN) # Combinamos la declaración del Token con la función de la API
 i = Info_Shodan() #Inicializo la Clase Info_Shodan()
 
 ##Comprobamos si existe la BBDD, sino creamos la BBDD##
-if path.isfile("usuarios.db") != True:
-	print("Creamos Base de datos de usuarios")
+if path.isfile("users.db") != True:
+	print("Creating a database of users")
 
-	conexion = sqlite3.connect('usuarios.db') # Nos conectamos a la base de datos usuarios.db (la crea si no existe)
+	conexion = sqlite3.connect('users.db') # Nos conectamos a la base de datos usuarios.db (la crea si no existe)
 	cursor = conexion.cursor() # Ahora crearemos una tabla de usuarios para almacenar "id", "mensaje" y "token de ip"
-	cursor.execute("CREATE TABLE usuarios (id INTEGER PRIMARY KEY AUTOINCREMENT,idtg VARCHAR(100),mensaje VARCHAR(100), tokenip VARCHAR(250))")
+	cursor.execute("CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT,idtg VARCHAR(100),mensaje VARCHAR(100), tokenip VARCHAR(250))")
 	conexion.commit() # Guardamos los cambios haciendo un commit
 
 	#cursor.execute("INSERT INTO usuarios VALUES (null,'188396571', 'apache 5', '1=192.168.1.211,2=192.168.1.209')")
@@ -130,12 +111,12 @@ def echo_all(message):
 	chat_id = message.from_user.id #ID único de Telegram
 
 	if(obtener_usuario_BBDD(chat_id)!=False):
-		print("Se encontro el usuario '{}' en la BBDD".format(chat_id))
+		print("The user '{}' was found in the database.".format(chat_id))
 
 		if(message.text.isdigit()):
 			ip = obtener_numero_teclado(message)
 			if(ip!=False):
-				print("Mostramos toda la info que nos da Shodan",ip)
+				print("Here's the info Shodan sent back",ip)
 				print()
 				cadena = i.host(ip)
 				print("dad")
@@ -143,37 +124,37 @@ def echo_all(message):
 
 				posicion=i.localizacion()
 				if(posicion!=False):
-					print("Posición:",posicion)
+					print("Position:",posicion)
 					lat_log = posicion.split(";") #parto el array por el igual
 					lat=float(lat_log[0])
 					log=float(lat_log[1])
 
 					bot.send_location(chat_id, lat, log)
 			else:
-				print("No encuntro nada, elimino el teclado")
+				print("Couldn't find anything.")
 				markup = types.ReplyKeyboardRemove(selective=False)
 				bot.send_message(chat_id, "CANCELAR", reply_markup=markup)
 		else:
-			print("Eliminamos el teclado del Pantalla y borramos la tabla de la BBDD")
+			print("Delete the table of the database.")
 			eliminar_usuario_BBDD(chat_id) #Eliminamos el usuario de la BBDD
 			markup = types.ReplyKeyboardRemove(selective=False)
 			bot.send_message(chat_id, "CANCELAR", reply_markup=markup)
 
 
 	else:
-		print("El usuario '{}' no está en la BBDD".format(chat_id));
+		print("The user '{}' is not in the database".format(chat_id));
 
 		if(message.text.find("shodan")!=-1):
 			bi = Biblioteca() #Libreria con funciones propias.
 			diccionario = bi.argumentos_validos(message.text)
 			if type(diccionario) is not dict:
-				cadena="<b>Error: </b>"+diccionario+"\n\n<b>Ayuda de uso:</b>\n\n"
-				cadena+="<b>SHODAN: </b>Shodan es un motor de búsqueda que le permite al usuario encontrar iguales o diferentes tipos específicos de equipos (routers, servidores, etc.) conectados a Internet a través de una variedad de filtros.\n"
-				cadena+="\n<b>Ejemplos de uso:</b>\n\n<code>shodan 'búsqueda' 'número de búsquedas'</code>\n\n<code>shodan apache</code>\n<code>shodan apache 5</code>\n"
-				cadena+="<code>shodan apache 20</code>.\n\nNota: <b>20</b> es el número máximo de busquedas"
+				cadena="<b>Error: </b>"+diccionario+"\n\n<b>Usage:</b>\n\n"
+				cadena+="<b>SHODAN: </b>Shodan is a search engine that allows the user to find the same or different specific types of equipment (routers, servers, etc.) connected to the Internet through a variety of filters.\n"
+				cadena+="\n<b>Usage examples:</b>\n\n<code>shodan 'search' 'number of searches'</code>\n\n<code>shodan apache</code>\n<code>shodan apache 5</code>\n"
+				cadena+="<code>shodan apache 20</code>.\n\nNota: <b>20</b> is the maximum number of searches"
 				bot.send_message(chat_id,cadena,parse_mode="HTML")
 			else:
-				print("Es un diccionario")
+				print("It is a dictionary")
 
 				res=""
 				if('n' in diccionario):
@@ -187,7 +168,7 @@ def echo_all(message):
 					array_tl = i.datos_telegram()
 					#print("token ip: ",i.obtener_token_array_ip())
 					guardar_usuario_BBDD(i.obtener_token_array_ip(),message.text,chat_id)
-					print("Guardamos usuario({})en la BBDD".format(chat_id))
+					print("Saving user({})in the Database".format(chat_id))
 
 					markup = crear_teclado_tl(resultados) #creamos el teclado del telegram
 
@@ -196,21 +177,21 @@ def echo_all(message):
 
 					#print("Diccionario_IP:",i.diccionario_ip)
 					#diccionario_shodan = i.diccionario_ip
-					bot.send_message(chat_id,"<b>Elige una opción (1/"+str(resultados)+"): </b>",parse_mode="HTML",reply_markup=markup)
+					bot.send_message(chat_id,"<b>Choose an option (1/"+str(resultados)+"): </b>",parse_mode="HTML",reply_markup=markup)
 
 				elif(res==False):
-						bot.send_message(chat_id,"No hay ningún resultado con la buscada: <b>"+str(diccionario["busqueda"]+"</b>"),parse_mode="HTML")
+						bot.send_message(chat_id,"No results are available for that search: <b>"+str(diccionario["busqueda"]+"</b>"),parse_mode="HTML")
 				else:
 					bot.send_message(chat_id,res,parse_mode="HTML")
 
-		elif message.text == "/autor":
-			texto = "<b>Autor:</b> Rubén Gonz. Juan\n"
+		elif message.text == "/author":
+			texto = "<b>Author:</b> Rubén Gonz. Juan\n"
 			texto+= "<b>Github:</b> https://github.com/rubenleon"
 			bot.send_message(chat_id, texto,parse_mode="HTML")
 
-		elif message.text == "cancelar":
+		elif message.text == "cancel":
 			markup = types.ReplyKeyboardRemove(selective=False)
-			bot.send_message(chat_id, "CANCELAR", reply_markup=markup)
+			bot.send_message(chat_id, "CANCEL", reply_markup=markup)
 
 
 	#print(message)
@@ -220,10 +201,10 @@ def echo_all(message):
 	mensaje = str(message.text)
 
 	print("")
-	print("ID: "+id_tele) #id de usuario
-	print("Nombre: "+nombre) #Nombre de usuario
-	print("Apellido: "+apellido) #Apellido de usuario
-	print("Mensaje: "+mensaje) #Mensaje
+	print("ID: "+id_tele) #User ID
+	print("First Name: "+nombre) #First Name of User
+	print("First Name: "+apellido) #Last Name of User
+	print("Message: "+mensaje) #Message
 	print("")
 
 def inicializar_bot():
@@ -232,12 +213,12 @@ def inicializar_bot():
 	except requests.exceptions.ReadTimeout:
 		print("Timeout occurred")
 		time.sleep(2)
-		print("Pausa de 2 segundos")
+		print("Two second pause")
 		inicializar_bot()
 	except requests.exceptions.ConnectionError:
-		print("Error en la conexión")
+		print("Connection Error")
 		time.sleep(2)
-		print("Pausa de 2 segundos")
+		print("Two second pause")
 		inicializar_bot()
 		#print(except)
 

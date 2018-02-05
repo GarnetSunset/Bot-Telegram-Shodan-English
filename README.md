@@ -1,41 +1,41 @@
-# Bot de Telegram sobre Shodan
+# Shodan Bot for Telegram
 
-## Creación del Bot
+## How to set up the bot.
 
-Lo primero que tenemos que hacer es buscar al **@botFather** en el Telegram
+The first thing we have to do is look for the **@botFather** in Telegram
 
 ![/newbot](img/Telegram-1.jpg)
 
-Pulsamos la opción de */newbot*
+Write the command */newbot*
 
 ![/newbot](/img/Telegram-2.jpg)
 
-Rellenamos la información que nos pide **@botFather** y nos dará **TOKEN** de nuestro BOT.
+Fill in the information requested by us **@botFather** and find the **TOKEN** for our BOT.
 
-## Añadir Comandos al Bot
+## Add Commands to the Bot
 
-> 1. Escribimos el comando **/mybots**.
+> 1. Write the command **/mybots**.
 
 ![/newbot](img/Telegram-3.jpg)
 
-> 2. Editamos el Bot pulsando en el botón **Edit Bot**
+> 2. Edit the Bot by clicking on the **Edit Bot** button
 
 ![/newbot](img/Telegram-4.jpg)
 
-> 3. Pulsamos en el botón de **Edit Commands** y escribimos la lista de comandos con este formato:
+> 3. Click the **Edit Commands** button and write the list of commands with this format:
 
 ```sh
-shodan - busqueda
-autor - autor del bot
+shodan - search
+author - author of the bot
 ```
 
 ![/newbot](img/Telegram-5.jpg)
 
-## Obtención de la Api de Shodan
+## Getting the Shodan API Key
 
-Entramos en la web oficial de https://www.shodan.io/ y pulsamos en el botón **SHOW API KEY**
+Go to https://www.shodan.io/, log in and push the **SHOW API KEY** button at the top right.
 
-## Instalación
+## Installation
 
 **Linux** (Ubuntu - Debian):
 
@@ -66,31 +66,31 @@ pip install shodan
 pip install sqlite3
 ```
 
-## Apis Externas del Bot
+## External APIs of the bot
 
-Tenemos que añadir la clave de shodan y de telegram a los siguientes ficheros:
+Put your Shodan API Key and your Telegram API Key in these files:
 *shodan-key.txt*
 *telegram-key.txt*
 
-## Ejecución del Bot
+## Running the Bot
 
-Ejecutamos el archivo **inicio.py**
+Run the file **start.py**
 
 **Linux** (Ubuntu - Debian):
 
 ```sh
-python3 inicio.py
+python3 start.py
 ```
 
 **Linux** (Arch Linux - Antergos):
 
 ```sh
-python inicio.py
+python start.py
 ```
-## Base de Datos
+## Database
 
-Para visualizar la Base de Datos utilizamos la siguiente aplicación: http://sqlitebrowser.org/
+If you wish to visualize the database the bot uses, open the database in this program: http://sqlitebrowser.org/
 
-## Video del Bot en Acción
+## Video of the bot in action!
 
 [![Video del Bot](img/video.jpg)](https://www.youtube.com/watch?v=Zpngydf6iwQ)
